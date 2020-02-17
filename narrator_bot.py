@@ -26,11 +26,12 @@ def on_say(bot, message):
 def on_joke(bot, message):
     text = message.get_text()
     command = (text.lstrip('/joke').strip())
-    parts = command.split()
-    if len(parts) != 2:
+    if ',' in command:
         parts = command.split(',')
-        if len(parts) != 2:
-            return
+    else:
+        parts = command.split()
+    if len(parts) != 2:
+        return
     top = parts[0]
     bottom = parts[1]
 
