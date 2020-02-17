@@ -1,12 +1,15 @@
 import re
 import random
+import subprocess
 
 import yaml
 from beekeeper_chatbot_sdk import BeekeeperChatBot
 from beekeeper_chatbot_sdk import CommandHandler
 from beekeeper_chatbot_sdk import RegexHandler
 from beekeeper_sdk.conversations import ConversationMessage
+from beekeeper_sdk.conversations import MESSAGE_TYPE_CONTROL
 from beekeeper_sdk.conversations import MESSAGE_TYPE_EVENT
+from beekeeper_sdk.conversations import MESSAGE_TYPE_REGULAR
 
 I_WILL_DO_IT_REGEX = re.compile(r"((we|i|you)('ll|\s+should|\s+will)|can\s+you|let\s+me|should\s+(we|i))", flags=re.I)
 BROKE_REGEX = re.compile(r"broke", flags=re.I)
@@ -18,6 +21,31 @@ ALPHABET = "abcdefghijklmnopqrstuvwxyz"
 def on_say(bot, message):
     text = message.get_text()
     message.reply(text.lstrip('/say').strip())
+
+
+def on_joke(bot, message):
+    text = message.get_text()
+    command = (text.lstrip('/joke').strip())
+    parts = command.split()
+    if len(parts) != 2:
+        parts = command.split(',')
+        if len(parts) != 2:
+            return
+    top = parts[0]
+    bottom = parts[1]
+
+    cmd = "jokescript/thejoke '{}' '{}' meme".format(top, bottom)
+
+    process = subprocess.run(
+        cmd,
+        capture_output=True,
+        shell=True,
+    )
+    status = process.returncode
+    if status != 0:
+        return
+    photo = bot.sdk.files.upload_photo_from_path("meme.png")
+    message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
 
 def on_will_do(bot, message):
@@ -42,7 +70,8 @@ def main(options):
     with open(options.config, 'r') as configfile:
         config = yaml.load(configfile, Loader=yaml.BaseLoader)
         bot = BeekeeperChatBot(config['tenant_url'], config['bot_token'])
-        bot.add_handler(CommandHandler('say', on_say))
+        bot.add_handler(CommandHandler('say', on_say, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
+        bot.add_handler(CommandHandler('joke', on_joke, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))
         bot.add_handler(RegexHandler(BROKE_REGEX, on_broke))
         bot.add_handler(RegexHandler(HANGMAN_REGEX, on_hangman))

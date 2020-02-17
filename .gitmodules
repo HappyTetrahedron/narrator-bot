@@ -1,0 +1,3 @@
+[submodule "jokescript"]
+	path = jokescript
+	url = https://github.com/Jereviendrai/thejoke
