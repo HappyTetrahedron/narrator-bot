@@ -1,0 +1,12 @@
+version: '2.2'
+
+services:
+  narrator-app:
+    restart: "no"
+    build:
+      context: .
+      args:
+      - NEXUS_TOKEN
+    volumes:
+      - ./config:/config
+

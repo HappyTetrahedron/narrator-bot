@@ -1,3 +1,2 @@
--e git+ssh://git@github.com/beekpr/beekeeper-sdk-python.git#egg=beekeeper_chatbot_sdk&subdirectory=chatbot-sdk 
--e git+ssh://git@github.com/beekpr/beekeeper-sdk-python.git#egg=beekeeper_sdk&subdirectory=beekeeper-sdk
 pyyaml
+beekeeper_chatbot_sdk==0.1.0
