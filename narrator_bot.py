@@ -10,6 +10,7 @@ from beekeeper_sdk.conversations import ConversationMessage
 from beekeeper_sdk.conversations import MESSAGE_TYPE_CONTROL
 from beekeeper_sdk.conversations import MESSAGE_TYPE_EVENT
 from beekeeper_sdk.conversations import MESSAGE_TYPE_REGULAR
+from beekeeper_sdk.files import FILE_UPLOAD_TYPE_VOICE
 
 I_WILL_DO_IT_REGEX = re.compile(r"((we|i|you)('ll|\s+should|\s+will)|can\s+you|let\s+me|should\s+(we|i))", flags=re.I)
 BROKE_REGEX = re.compile(r"broke", flags=re.I)
@@ -49,6 +50,11 @@ def on_joke(bot, message):
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
 
+def on_badum(bot, message):
+    photo = bot.sdk.files.upload_file_from_path("media/badumdish.webm", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+
+
 def on_will_do(bot, message):
     message.reply(ConversationMessage(
         bot.sdk,
@@ -73,6 +79,7 @@ def main(options):
         bot = BeekeeperChatBot(config['tenant_url'], config['bot_token'])
         bot.add_handler(CommandHandler('say', on_say, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('joke', on_joke, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
+        bot.add_handler(CommandHandler('badum', on_badum, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))
         bot.add_handler(RegexHandler(BROKE_REGEX, on_broke))
         bot.add_handler(RegexHandler(HANGMAN_REGEX, on_hangman))
