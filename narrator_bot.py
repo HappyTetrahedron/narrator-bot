@@ -51,7 +51,7 @@ def on_joke(bot, message):
 
 
 def on_badum(bot, message):
-    photo = bot.sdk.files.upload_file_from_path("media/badumdish.webm", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    photo = bot.sdk.files.upload_file_from_path("media/badumdish.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
 
