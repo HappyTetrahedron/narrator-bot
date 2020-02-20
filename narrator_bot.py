@@ -17,6 +17,13 @@ BROKE_REGEX = re.compile(r"broke", flags=re.I)
 HANGMAN_REGEX = r"Failed guesses:|Send exactly one letter to guess"
 
 ALPHABET = "abcdefghijklmnopqrstuvwxyz"
+HELPFUL_HELP = [
+    "You looked for help everywhere, but alas, there was none.",
+    "Why are you looking at me? I'm just a narrator!",
+    "Helplessness is a lifestyle.",
+    "You turned to the bot and said: \"/help\", but the bot didn't answer.",
+    "You quickly realize that you wouldn't find any help here.",
+]
 
 
 def on_say(bot, message):
@@ -55,6 +62,10 @@ def on_badum(bot, message):
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
 
+def on_help(bot, message):
+    message.reply(random.choice(HELPFUL_HELP))
+
+
 def on_will_do(bot, message):
     message.reply(ConversationMessage(
         bot.sdk,
@@ -80,6 +91,7 @@ def main(options):
         bot.add_handler(CommandHandler('say', on_say, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('joke', on_joke, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('badum', on_badum, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
+        bot.add_handler(CommandHandler('help', on_help))
         bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))
         bot.add_handler(RegexHandler(BROKE_REGEX, on_broke))
         bot.add_handler(RegexHandler(HANGMAN_REGEX, on_hangman))
