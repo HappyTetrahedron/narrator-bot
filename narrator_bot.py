@@ -62,6 +62,16 @@ def on_badum(bot, message):
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
 
+def on_trombone(bot, message):
+    photo = bot.sdk.files.upload_file_from_path("media/sadtrombone.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+
+
+def on_silence(bot, message):
+    photo = bot.sdk.files.upload_file_from_path("media/silence.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+
+
 def on_help(bot, message):
     message.reply(random.choice(HELPFUL_HELP))
 
@@ -91,6 +101,8 @@ def main(options):
         bot.add_handler(CommandHandler('say', on_say, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('joke', on_joke, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('badum', on_badum, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
+        bot.add_handler(CommandHandler('trombone', on_trombone, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
+        bot.add_handler(CommandHandler('silence', on_silence, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('help', on_help))
         bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))
         bot.add_handler(RegexHandler(BROKE_REGEX, on_broke))

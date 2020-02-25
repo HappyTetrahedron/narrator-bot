@@ -1,2 +1,2 @@
 pyyaml
-beekeeper_chatbot_sdk==0.1.0
+beekeeper_chatbot_sdk==0.2.0
