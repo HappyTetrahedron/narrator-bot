@@ -13,7 +13,7 @@ from beekeeper_sdk.conversations import MESSAGE_TYPE_REGULAR
 from beekeeper_sdk.files import FILE_UPLOAD_TYPE_VOICE
 
 I_WILL_DO_IT_REGEX = re.compile(r"((we|i|you)('ll|\s+should|\s+will)|can\s+you|let\s+me|should\s+(we|i))", flags=re.I)
-BROKE_REGEX = re.compile(r"broke", flags=re.I)
+BROKE_REGEX = re.compile(r"broke|bork", flags=re.I)
 HANGMAN_REGEX = r"Failed guesses:|Send exactly one letter to guess"
 
 ALPHABET = "abcdefghijklmnopqrstuvwxyz"
@@ -86,7 +86,10 @@ def on_will_do(bot, message):
 
 def on_broke(bot, message):
     if random.random() > 0.75:
-        message.reply("Did you try turning it off and on again?")
+        if random.random() > 0.25:
+            message.reply("Did you try turning it off and on again?")
+        else:
+            on_trombone(bot, message)
 
 
 def on_hangman(bot, message):
