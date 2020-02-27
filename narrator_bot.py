@@ -77,11 +77,12 @@ def on_help(bot, message):
 
 
 def on_will_do(bot, message):
-    message.reply(ConversationMessage(
-        bot.sdk,
-        text="But they never did.",
-        message_type=MESSAGE_TYPE_EVENT
-    ))
+    if random.random() > 0.75:
+        message.reply(ConversationMessage(
+            bot.sdk,
+            text="But they never did.",
+            message_type=MESSAGE_TYPE_EVENT
+        ))
 
 
 def on_broke(bot, message):
