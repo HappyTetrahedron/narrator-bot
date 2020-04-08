@@ -70,6 +70,10 @@ def on_migros(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/migros.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
+def on_pingui(bot, message):
+    photo = bot.sdk.files.upload_file_from_path("media/pingui.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+
 def on_drama(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/drama.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
@@ -113,7 +117,9 @@ def main(options):
         bot.add_handler(CommandHandler('joke', on_joke, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('badum', on_badum, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('trombone', on_trombone, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
+        bot.add_handler(CommandHandler('sadtrombone', on_trombone, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('migros', on_migros, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
+        bot.add_handler(CommandHandler('pingui', on_pingui, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('drama', on_drama, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('silence', on_silence, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('help', on_help))
