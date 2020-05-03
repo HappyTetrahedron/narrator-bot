@@ -14,6 +14,7 @@ from beekeeper_sdk.files import FILE_UPLOAD_TYPE_VOICE
 
 I_WILL_DO_IT_REGEX = re.compile(r"((we|i|you)('ll|\s+should|\s+will)|can\s+you|let\s+me|should\s+(we|i))", flags=re.I)
 BROKE_REGEX = re.compile(r"broke|bork", flags=re.I)
+WTF_REGEX = re.compile(r"w\.?\s?t\.?\s?f\.?", flags=re.I)
 HANGMAN_REGEX = r"Failed guesses:|Send exactly one letter to guess"
 
 ALPHABET = "abcdefghijklmnopqrstuvwxyz"
@@ -78,6 +79,10 @@ def on_drama(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/drama.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
+def on_perfection(bot, message):
+    photo = bot.sdk.files.upload_file_from_path("media/perfection.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+
 def on_silence(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/silence.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
@@ -104,6 +109,11 @@ def on_broke(bot, message):
             on_trombone(bot, message)
 
 
+def on_wtf(bot, message):
+    if random.random() > 0.90:
+        on_perfection(bot, message)
+
+
 def on_hangman(bot, message):
     if random.random() > 0.9:
         message.reply(random.choice(ALPHABET))
@@ -121,10 +131,12 @@ def main(options):
         bot.add_handler(CommandHandler('migros', on_migros, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('pingui', on_pingui, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('drama', on_drama, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
+        bot.add_handler(CommandHandler('perfection', on_perfection, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('silence', on_silence, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('help', on_help))
         bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))
         bot.add_handler(RegexHandler(BROKE_REGEX, on_broke))
+        bot.add_handler(RegexHandler(WTF_REGEX, on_wtf))
         bot.add_handler(RegexHandler(HANGMAN_REGEX, on_hangman))
         bot.start()
 
