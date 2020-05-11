@@ -23,6 +23,7 @@ HELPFUL_HELP = [
     "You looked for help everywhere, but alas, there was none.",
     "Why are you looking at me? I'm just a narrator!",
     "Helplessness is a lifestyle.",
+    "But nobody came.",
     "You turned to the bot and said: \"/help\", but the bot didn't answer.",
     "You quickly realize that you wouldn't find any help here.",
 ]
