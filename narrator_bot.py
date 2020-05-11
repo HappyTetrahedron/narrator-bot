@@ -13,6 +13,7 @@ from beekeeper_sdk.conversations import MESSAGE_TYPE_REGULAR
 from beekeeper_sdk.files import FILE_UPLOAD_TYPE_VOICE
 
 I_WILL_DO_IT_REGEX = re.compile(r"((we|i|you)('ll|\s+should|\s+will)|can\s+you|let\s+me|should\s+(we|i))", flags=re.I)
+ASK_HELP_REGEX = re.compile(r"^help|[^\/]help", flags=re.I)
 BROKE_REGEX = re.compile(r"broke|bork", flags=re.I)
 WTF_REGEX = re.compile(r"w\.?\s?t\.?\s?f\.?", flags=re.I)
 HANGMAN_REGEX = r"Failed guesses:|Send exactly one letter to guess"
@@ -92,6 +93,15 @@ def on_help(bot, message):
     message.reply(random.choice(HELPFUL_HELP))
 
 
+def on_ask_help(bot, message):
+    if random.random() > 0.9:
+        message.reply(ConversationMessage(
+            bot.sdk,
+            text="But nobody came.",
+            message_type=MESSAGE_TYPE_EVENT
+        ))
+
+
 def on_will_do(bot, message):
     if random.random() > 0.75:
         message.reply(ConversationMessage(
@@ -134,6 +144,7 @@ def main(options):
         bot.add_handler(CommandHandler('perfection', on_perfection, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('silence', on_silence, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('help', on_help))
+        bot.add_handler(RegexHandler(ASK_HELP_REGEX, on_ask_help))
         bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))
         bot.add_handler(RegexHandler(BROKE_REGEX, on_broke))
         bot.add_handler(RegexHandler(WTF_REGEX, on_wtf))
