@@ -96,15 +96,22 @@ def on_help(bot, message):
 
 def on_ask_help(bot, message):
     if random.random() > 0.9:
-        message.reply(ConversationMessage(
-            bot.sdk,
-            text="But nobody came.",
-            message_type=MESSAGE_TYPE_EVENT
-        ))
+        if random.random() > 0.3:
+            message.reply(ConversationMessage(
+                bot.sdk,
+                text="But nobody came",
+                message_type=MESSAGE_TYPE_EVENT
+            ))
+        else:
+            message.reply(ConversationMessage(
+                bot.sdk,
+                text="No one's around to help",
+                message_type=MESSAGE_TYPE_EVENT
+            ))
 
 
 def on_will_do(bot, message):
-    if random.random() > 0.75:
+    if random.random() > 0.9:
         message.reply(ConversationMessage(
             bot.sdk,
             text="But they never did.",
