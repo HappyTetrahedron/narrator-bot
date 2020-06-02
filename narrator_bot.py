@@ -1,6 +1,7 @@
 import re
 import random
 import subprocess
+import datetime
 
 import yaml
 from beekeeper_chatbot_sdk import BeekeeperChatBot
@@ -27,6 +28,10 @@ HELPFUL_HELP = [
     "You turned to the bot and said: \"/help\", but the bot didn't answer.",
     "You quickly realize that you wouldn't find any help here.",
 ]
+PROFESSIONAL_HELP = "I can send various sound effects to a chat. Try /badum or /sadtrombone, for example."
+
+state = {}
+conversation_cache = {}
 
 
 def on_say(bot, message):
@@ -69,21 +74,26 @@ def on_trombone(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/sadtrombone.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
+
 def on_migros(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/migros.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
+
 
 def on_pingui(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/pingui.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
+
 def on_drama(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/drama.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
 
+
 def on_perfection(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/perfection.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     message.reply(ConversationMessage(bot.sdk, media=[photo]))
+
 
 def on_silence(bot, message):
     photo = bot.sdk.files.upload_file_from_path("media/silence.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
@@ -91,45 +101,52 @@ def on_silence(bot, message):
 
 
 def on_help(bot, message):
-    message.reply(random.choice(HELPFUL_HELP))
+    if is_casual_chat(bot, message.get_conversation_id()):
+        message.reply(random.choice(HELPFUL_HELP))
+    else:
+        message.reply(PROFESSIONAL_HELP)
 
 
 def on_ask_help(bot, message):
     if random.random() > 0.9:
-        if random.random() > 0.3:
-            message.reply(ConversationMessage(
-                bot.sdk,
-                text="But nobody came",
-                message_type=MESSAGE_TYPE_EVENT
-            ))
-        else:
-            message.reply(ConversationMessage(
-                bot.sdk,
-                text="No one's around to help",
-                message_type=MESSAGE_TYPE_EVENT
-            ))
+        if is_casual_chat(bot, message.get_conversation_id()):
+            if random.random() > 0.3:
+                message.reply(ConversationMessage(
+                    bot.sdk,
+                    text="But nobody came",
+                    message_type=MESSAGE_TYPE_EVENT
+                ))
+            else:
+                message.reply(ConversationMessage(
+                    bot.sdk,
+                    text="No one's around to help",
+                    message_type=MESSAGE_TYPE_EVENT
+                ))
 
 
 def on_will_do(bot, message):
-    if random.random() > 0.9:
-        message.reply(ConversationMessage(
-            bot.sdk,
-            text="But they never did.",
-            message_type=MESSAGE_TYPE_EVENT
-        ))
+    if random.random() > 9.0:
+        if is_casual_chat(bot, message.get_conversation_id()):
+            message.reply(ConversationMessage(
+                bot.sdk,
+                text="But they never did.",
+                message_type=MESSAGE_TYPE_EVENT
+            ))
 
 
 def on_broke(bot, message):
     if random.random() > 0.75:
-        if random.random() > 0.25:
-            message.reply("Did you try turning it off and on again?")
-        else:
-            on_trombone(bot, message)
+        if is_casual_chat(bot, message.get_conversation_id()):
+            if random.random() > 0.25:
+                message.reply("Did you try turning it off and on again?")
+            else:
+                on_trombone(bot, message)
 
 
 def on_wtf(bot, message):
     if random.random() > 0.90:
-        on_perfection(bot, message)
+        if is_casual_chat(bot, message.get_conversation_id()):
+            on_perfection(bot, message)
 
 
 def on_hangman(bot, message):
@@ -137,9 +154,24 @@ def on_hangman(bot, message):
         message.reply(random.choice(ALPHABET))
 
 
+def is_casual_chat(bot, conversation_id):
+    if conversation_id in conversation_cache:
+        time = conversation_cache[conversation_id]['timestamp']
+        if datetime.datetime.now() - time < datetime.timedelta(hours=4):
+            return conversation_cache[conversation_id]['is_casual']
+    members = bot.sdk.conversations.get_members_of_conversation_iterator(conversation_id, True)
+    is_casual = any([member.get_id() == state['casual_conversation_marker'] for member in members])
+    conversation_cache[conversation_id] = {
+        'timestamp': datetime.datetime.now(),
+        'is_casual': is_casual,
+    }
+    return is_casual
+
+
 def main(options):
     with open(options.config, 'r') as configfile:
         config = yaml.load(configfile, Loader=yaml.BaseLoader)
+        state['casual_conversation_marker'] = config['casual_conversation_marker_uuid']
         bot = BeekeeperChatBot(config['tenant_url'], config['bot_token'])
         bot.add_handler(CommandHandler('say', on_say, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('joke', on_joke, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
