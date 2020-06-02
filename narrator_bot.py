@@ -32,6 +32,7 @@ PROFESSIONAL_HELP = "I can send various sound effects to a chat. Try /badum or /
 
 state = {}
 conversation_cache = {}
+sound_files = {}
 
 
 def on_say(bot, message):
@@ -66,38 +67,31 @@ def on_joke(bot, message):
 
 
 def on_badum(bot, message):
-    photo = bot.sdk.files.upload_file_from_path("media/badumdish.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+    message.reply(ConversationMessage(bot.sdk, media=[sound_files['badum']]))
 
 
 def on_trombone(bot, message):
-    photo = bot.sdk.files.upload_file_from_path("media/sadtrombone.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+    message.reply(ConversationMessage(bot.sdk, media=[sound_files['trombone']]))
 
 
 def on_migros(bot, message):
-    photo = bot.sdk.files.upload_file_from_path("media/migros.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+    message.reply(ConversationMessage(bot.sdk, media=[sound_files['migros']]))
 
 
 def on_pingui(bot, message):
-    photo = bot.sdk.files.upload_file_from_path("media/pingui.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+    message.reply(ConversationMessage(bot.sdk, media=[sound_files['pingui']]))
 
 
 def on_drama(bot, message):
-    photo = bot.sdk.files.upload_file_from_path("media/drama.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+    message.reply(ConversationMessage(bot.sdk, media=[sound_files['drama']]))
 
 
 def on_perfection(bot, message):
-    photo = bot.sdk.files.upload_file_from_path("media/perfection.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+    message.reply(ConversationMessage(bot.sdk, media=[sound_files['perfection']]))
 
 
 def on_silence(bot, message):
-    photo = bot.sdk.files.upload_file_from_path("media/silence.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-    message.reply(ConversationMessage(bot.sdk, media=[photo]))
+    message.reply(ConversationMessage(bot.sdk, media=[sound_files['silence']]))
 
 
 def on_help(bot, message):
@@ -168,11 +162,22 @@ def is_casual_chat(bot, conversation_id):
     return is_casual
 
 
+def init_sound_files(bot):
+    sound_files['badum'] = bot.sdk.files.upload_file_from_path("media/badumdish.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    sound_files['trombone'] = bot.sdk.files.upload_file_from_path("media/sadtrombone.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    sound_files['migros'] = bot.sdk.files.upload_file_from_path("media/migros.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    sound_files['pingui'] = bot.sdk.files.upload_file_from_path("media/pingui.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    sound_files['drama'] = bot.sdk.files.upload_file_from_path("media/drama.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    sound_files['perfection'] = bot.sdk.files.upload_file_from_path("media/perfection.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+    sound_files['silence'] = bot.sdk.files.upload_file_from_path("media/silence.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+
+
 def main(options):
     with open(options.config, 'r') as configfile:
         config = yaml.load(configfile, Loader=yaml.BaseLoader)
         state['casual_conversation_marker'] = config['casual_conversation_marker_uuid']
         bot = BeekeeperChatBot(config['tenant_url'], config['bot_token'])
+        init_sound_files(bot)
         bot.add_handler(CommandHandler('say', on_say, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('joke', on_joke, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
         bot.add_handler(CommandHandler('badum', on_badum, message_types=[MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]))
