@@ -119,7 +119,7 @@ def on_ask_help(bot, message):
 
 
 def on_will_do(bot, message):
-    if random.random() > 9.0:
+    if random.random() > 0.9:
         if is_casual_chat(bot, message.get_conversation_id()):
             message.reply(ConversationMessage(
                 bot.sdk,
