@@ -8,6 +8,7 @@ import yaml
 I_WILL_DO_IT_REGEX = re.compile(r"((we|i|you)('ll|\s+should|\s+will)|can\s+you|let\s+me|should\s+(we|i))", flags=re.I)
 ASK_HELP_REGEX = re.compile(r"^help|[^\/]help", flags=re.I)
 BROKE_REGEX = re.compile(r"broke|bork", flags=re.I)
+DEVOPS_REGEX = re.compile(r"dev-?ops", flags=re.I)
 WTF_REGEX = re.compile(r"w\.?\s?t\.?\s?f\.?", flags=re.I)
 HANGMAN_REGEX = r"Failed guesses:|Send exactly one letter to guess"
 
@@ -162,6 +163,18 @@ def on_broke(bot, message):
             else:
                 on_trombone(bot, message)
 
+def on_devops(bot, message):
+    if random.random() > 0.5:
+        if random.random() > 0.5:
+            reply(bot, message, "Friendly reminder: DevOps has been renamed to Ground Control.")
+        else:
+            reply(bot, message, "Did you mean: \"Ground Control\"?")
+    else:
+        if random.random() > 0.5:
+            reply(bot, message, "It's spelled \"Ground Control\".")
+        else:
+            reply(bot, message, "s/DevOps/Ground Control/")
+
 
 def on_wtf(bot, message):
     if random.random() > 0.90:
@@ -234,6 +247,7 @@ def main(options):
     bot.add_handler(CommandHandler('help', on_help))
     bot.add_handler(RegexHandler(ASK_HELP_REGEX, on_ask_help))
     bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))
+    bot.add_handler(RegexHandler(DEVOPS_REGEX, on_devops))
     bot.add_handler(RegexHandler(BROKE_REGEX, on_broke))
     bot.add_handler(RegexHandler(WTF_REGEX, on_wtf))
     bot.add_handler(RegexHandler(HANGMAN_REGEX, on_hangman))
