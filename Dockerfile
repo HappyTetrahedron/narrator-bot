@@ -13,4 +13,4 @@ ADD media /app/media
 WORKDIR /app
 ADD narrator_bot.py /app
 
-CMD python narrator_bot.py -c /config/config.yml
+CMD python -u narrator_bot.py -c /config/config.yml
