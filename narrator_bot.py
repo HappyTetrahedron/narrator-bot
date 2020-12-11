@@ -38,7 +38,7 @@ def reply(bot, message, text):
     if state['mode'] == 'beekeeper':
         message.reply(text)
     if state['mode'] == 'telegram':
-        bot.message.reply_text(text)
+        bot.message.reply_text(text, quote=False)
 
 
 def reply_event(bot, message, text):
@@ -49,7 +49,7 @@ def reply_event(bot, message, text):
             message_type=MESSAGE_TYPE_EVENT
         ))
     if state['mode'] == 'telegram':
-        bot.message.reply_text(text)
+        bot.message.reply_text(text, quote=False)
 
 
 def send_voice(bot, message, filename):
@@ -58,9 +58,9 @@ def send_voice(bot, message, filename):
     if state['mode'] == 'telegram':
         vfile = sound_files[filename]
         if isinstance(vfile, str):
-            bot.message.reply_voice(vfile)
+            bot.message.reply_voice(vfile, quote=False)
         else:
-            sent = bot.message.reply_voice(vfile)
+            sent = bot.message.reply_voice(vfile, quote=False)
             vfile.close()
             sound_files[filename] = sent.effective_attachment.file_id
 
@@ -70,7 +70,7 @@ def send_photo(bot, message, filename):
         photo = bot.sdk.files.upload_photo_from_path("meme.png")
         message.reply(ConversationMessage(bot.sdk, media=[photo]))
     if state['mode'] == 'telegram':
-        bot.message.reply_photo(open(filename, 'rb'))
+        bot.message.reply_photo(open(filename, 'rb'), quote=False)
 
 
 def on_say(bot, message):
