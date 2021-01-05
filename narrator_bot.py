@@ -109,8 +109,10 @@ def on_badum(bot, message):
 
 
 def on_champd(bot, message):
-    send_voice(bot, message, 'champd')
+    send_voice(bot, message, 'champd-ins')
 
+def on_champd_lyrics(bot, message):
+    send_voice(bot, message, 'champd')
 
 def on_trombone(bot, message):
     send_voice(bot, message, 'trombone')
@@ -197,6 +199,7 @@ def is_casual_chat(bot, message):
 
 def init_sound_files(bot):
     if state['mode'] == 'beekeeper':
+        sound_files['champd-ins'] = bot.sdk.files.upload_file_from_path("media/champd-ins.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['champd'] = bot.sdk.files.upload_file_from_path("media/champd.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['badum'] = bot.sdk.files.upload_file_from_path("media/badumdish.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['trombone'] = bot.sdk.files.upload_file_from_path("media/sadtrombone.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
@@ -207,6 +210,7 @@ def init_sound_files(bot):
         sound_files['silence'] = bot.sdk.files.upload_file_from_path("media/silence.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
     if state['mode'] == 'telegram':
         sound_files['champd'] = open("media/champd.opus", 'rb')
+        sound_files['champd-ins'] = open("media/champd-ins.opus", 'rb')
         sound_files['badum'] = open("media/badumdish.opus", 'rb')
         sound_files['trombone'] = open("media/sadtrombone.opus", 'rb')
         sound_files['migros'] = open("media/migros.opus", 'rb')
@@ -232,6 +236,7 @@ def main(options):
     bot.add_handler(CommandHandler('badum', on_badum, **kwargs))
     bot.add_handler(CommandHandler('champd', on_champd, **kwargs))
     bot.add_handler(CommandHandler('champdup', on_champd, **kwargs))
+    bot.add_handler(CommandHandler('champdl', on_champd_lyrics, **kwargs))
     bot.add_handler(CommandHandler('trombone', on_trombone, **kwargs))
     bot.add_handler(CommandHandler('sadtrombone', on_trombone, **kwargs))
     bot.add_handler(CommandHandler('migros', on_migros, **kwargs))
