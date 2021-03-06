@@ -120,6 +120,9 @@ def on_trombone(bot, message):
 def on_potato(bot, message):
     send_voice(bot, message, 'chummypotato')
 
+def on_dishwasher(bot, message):
+    send_voice(bot, message, 'dishwasher')
+
 def on_migros(bot, message):
     send_voice(bot, message, 'migros')
 
@@ -206,6 +209,7 @@ def init_sound_files(bot):
         sound_files['badum'] = bot.sdk.files.upload_file_from_path("media/badumdish.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['trombone'] = bot.sdk.files.upload_file_from_path("media/sadtrombone.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['chummypotato'] = bot.sdk.files.upload_file_from_path("media/chummypotato.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+        sound_files['dishwasher'] = bot.sdk.files.upload_file_from_path("media/dishwasher.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['migros'] = bot.sdk.files.upload_file_from_path("media/migros.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['pingui'] = bot.sdk.files.upload_file_from_path("media/pingui.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['drama'] = bot.sdk.files.upload_file_from_path("media/drama.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
@@ -216,6 +220,7 @@ def init_sound_files(bot):
         sound_files['champd-ins'] = open("media/champd-ins.opus", 'rb')
         sound_files['badum'] = open("media/badumdish.opus", 'rb')
         sound_files['chummypotato'] = open("media/chummypotato.opus", 'rb')
+        sound_files['dishwasher'] = open("media/dishwasher.opus", 'rb')
         sound_files['migros'] = open("media/migros.opus", 'rb')
         sound_files['pingui'] = open("media/pingui.opus", 'rb')
         sound_files['drama'] = open("media/drama.opus", 'rb')
@@ -242,6 +247,7 @@ def main(options):
     bot.add_handler(CommandHandler('champdl', on_champd_lyrics, **kwargs))
     bot.add_handler(CommandHandler('trombone', on_trombone, **kwargs))
     bot.add_handler(CommandHandler('potato', on_potato, **kwargs))
+    bot.add_handler(CommandHandler('dishwasher', on_dishwasher, **kwargs))
     bot.add_handler(CommandHandler('sadtrombone', on_trombone, **kwargs))
     bot.add_handler(CommandHandler('migros', on_migros, **kwargs))
     bot.add_handler(CommandHandler('pingui', on_pingui, **kwargs))
