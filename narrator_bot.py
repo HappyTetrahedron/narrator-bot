@@ -219,6 +219,7 @@ def init_sound_files(bot):
         sound_files['champd'] = open("media/champd.opus", 'rb')
         sound_files['champd-ins'] = open("media/champd-ins.opus", 'rb')
         sound_files['badum'] = open("media/badumdish.opus", 'rb')
+        sound_files['trombone'] = open("media/sadtrombone.opus", 'rb')
         sound_files['chummypotato'] = open("media/chummypotato.opus", 'rb')
         sound_files['dishwasher'] = open("media/dishwasher.opus", 'rb')
         sound_files['migros'] = open("media/migros.opus", 'rb')
