@@ -244,6 +244,7 @@ def main(options):
     bot.add_handler(CommandHandler('joke', on_joke, **kwargs))
     bot.add_handler(CommandHandler('badum', on_badum, **kwargs))
     bot.add_handler(CommandHandler('champd', on_champd, **kwargs))
+    bot.add_handler(CommandHandler('pogchamp', on_champd, **kwargs))
     bot.add_handler(CommandHandler('champdup', on_champd, **kwargs))
     bot.add_handler(CommandHandler('champdl', on_champd_lyrics, **kwargs))
     bot.add_handler(CommandHandler('trombone', on_trombone, **kwargs))
