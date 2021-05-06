@@ -120,6 +120,9 @@ def on_trombone(bot, message):
 def on_hype(bot, message):
     send_voice(bot, message, 'hypetrain')
 
+def on_circus(bot, message):
+    send_voice(bot, message, 'circus')
+
 def on_potato(bot, message):
     send_voice(bot, message, 'chummypotato')
 
@@ -212,6 +215,7 @@ def init_sound_files(bot):
         sound_files['badum'] = bot.sdk.files.upload_file_from_path("media/badumdish.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['trombone'] = bot.sdk.files.upload_file_from_path("media/sadtrombone.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['hypetrain'] = bot.sdk.files.upload_file_from_path("media/hypetrain.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
+        sound_files['circus'] = bot.sdk.files.upload_file_from_path("media/circus.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['chummypotato'] = bot.sdk.files.upload_file_from_path("media/chummypotato.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['dishwasher'] = bot.sdk.files.upload_file_from_path("media/dishwasher.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
         sound_files['migros'] = bot.sdk.files.upload_file_from_path("media/migros.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
@@ -225,6 +229,7 @@ def init_sound_files(bot):
         sound_files['badum'] = open("media/badumdish.opus", 'rb')
         sound_files['trombone'] = open("media/sadtrombone.opus", 'rb')
         sound_files['hypetrain'] = open("media/hypetrain.opus", 'rb')
+        sound_files['circus'] = open("media/circus.opus", 'rb')
         sound_files['chummypotato'] = open("media/chummypotato.opus", 'rb')
         sound_files['dishwasher'] = open("media/dishwasher.opus", 'rb')
         sound_files['migros'] = open("media/migros.opus", 'rb')
@@ -254,6 +259,7 @@ def main(options):
     bot.add_handler(CommandHandler('champdl', on_champd_lyrics, **kwargs))
     bot.add_handler(CommandHandler('trombone', on_trombone, **kwargs))
     bot.add_handler(CommandHandler('hype', on_hype, **kwargs))
+    bot.add_handler(CommandHandler('circus', on_circus, **kwargs))
     bot.add_handler(CommandHandler('train', on_hype, **kwargs))
     bot.add_handler(CommandHandler('hypetrain', on_hype, **kwargs))
     bot.add_handler(CommandHandler('potato', on_potato, **kwargs))
