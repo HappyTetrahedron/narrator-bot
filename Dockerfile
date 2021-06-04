@@ -7,6 +7,7 @@ RUN mkdir /app
 ADD requirements.txt /app
 RUN pip install -i https://pypi-group:${NEXUS_TOKEN}@nexus.internal.beekeeper.io/repository/pypi-group/simple -r /app/requirements.txt
 
+ADD sounds.yml /app/sounds.yml
 ADD jokescript /app/jokescript
 ADD media /app/media
 
