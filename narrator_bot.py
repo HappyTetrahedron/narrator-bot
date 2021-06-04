@@ -104,51 +104,6 @@ def on_joke(bot, message):
     send_photo(bot, message, 'meme.png')
 
 
-def on_badum(bot, message):
-    send_voice(bot, message, 'badum')
-
-
-def on_champd(bot, message):
-    send_voice(bot, message, 'champd-ins')
-
-def on_champd_lyrics(bot, message):
-    send_voice(bot, message, 'champd')
-
-def on_trombone(bot, message):
-    send_voice(bot, message, 'trombone')
-
-def on_hype(bot, message):
-    send_voice(bot, message, 'hypetrain')
-
-def on_circus(bot, message):
-    send_voice(bot, message, 'circus')
-
-def on_potato(bot, message):
-    send_voice(bot, message, 'chummypotato')
-
-def on_dishwasher(bot, message):
-    send_voice(bot, message, 'dishwasher')
-
-def on_migros(bot, message):
-    send_voice(bot, message, 'migros')
-
-
-def on_pingui(bot, message):
-    send_voice(bot, message, 'pingui')
-
-
-def on_drama(bot, message):
-    send_voice(bot, message, 'drama')
-
-
-def on_perfection(bot, message):
-    send_voice(bot, message, 'perfection')
-
-
-def on_silence(bot, message):
-    send_voice(bot, message, 'silence')
-
-
 def on_help(bot, message):
     if is_casual_chat(bot, message):
         reply(bot, message, random.choice(HELPFUL_HELP))
@@ -177,13 +132,13 @@ def on_broke(bot, message):
             if random.random() > 0.25:
                 reply(bot, message, "Did you try turning it off and on again?")
             else:
-                on_trombone(bot, message)
+                send_voice(bot, message, 'sadtrombone.opus')
 
 
 def on_wtf(bot, message):
     if random.random() > 0.90:
         if is_casual_chat(bot, message):
-            on_perfection(bot, message)
+            send_voice(bot, message, 'perfection.opus')
 
 
 def on_hangman(bot, message):
@@ -238,6 +193,21 @@ def init_sound_files(bot):
         sound_files['perfection'] = open("media/perfection.opus", 'rb')
         sound_files['silence'] = open("media/silence.opus", 'rb')
 
+def register_sounds(bot, kwargs):
+    with open('sounds.yml', 'r') as soundfile:
+        sounds = yaml.load(soundfile, Loader=yaml.BaseLoader)
+    for sound in sounds:
+        if state['mode'] == 'beekeeper':
+            sound_files[sound['file']] = bot.sdk.files.upload_file_from_path("media/{}".format(sound['file']), upload_type=FILE_UPLOAD_TYPE_VOICE)
+        if state['mode'] == 'telegram':
+            sound_files[sound['file']] = open("media/{}".format(sound['file']), 'rb')
+        for command in sound['commands']:
+            bot.add_handler(CommandHandler(command, (lambda bot, message, s=sound['file']: send_voice(bot, message, s)), **kwargs))
+
+    print(sound_files)
+
+
+
 
 def main(options):
     if state['mode'] == 'beekeeper':
@@ -249,27 +219,10 @@ def main(options):
         bot = updater.dispatcher
         kwargs = {}
 
-    init_sound_files(bot)
+    register_sounds(bot, kwargs)
+
     bot.add_handler(CommandHandler('say', on_say, **kwargs))
     bot.add_handler(CommandHandler('joke', on_joke, **kwargs))
-    bot.add_handler(CommandHandler('badum', on_badum, **kwargs))
-    bot.add_handler(CommandHandler('champd', on_champd, **kwargs))
-    bot.add_handler(CommandHandler('pogchamp', on_champd, **kwargs))
-    bot.add_handler(CommandHandler('champdup', on_champd, **kwargs))
-    bot.add_handler(CommandHandler('champdl', on_champd_lyrics, **kwargs))
-    bot.add_handler(CommandHandler('trombone', on_trombone, **kwargs))
-    bot.add_handler(CommandHandler('hype', on_hype, **kwargs))
-    bot.add_handler(CommandHandler('circus', on_circus, **kwargs))
-    bot.add_handler(CommandHandler('train', on_hype, **kwargs))
-    bot.add_handler(CommandHandler('hypetrain', on_hype, **kwargs))
-    bot.add_handler(CommandHandler('potato', on_potato, **kwargs))
-    bot.add_handler(CommandHandler('dishwasher', on_dishwasher, **kwargs))
-    bot.add_handler(CommandHandler('sadtrombone', on_trombone, **kwargs))
-    bot.add_handler(CommandHandler('migros', on_migros, **kwargs))
-    bot.add_handler(CommandHandler('pingui', on_pingui, **kwargs))
-    bot.add_handler(CommandHandler('drama', on_drama, **kwargs))
-    bot.add_handler(CommandHandler('perfection', on_perfection, **kwargs))
-    bot.add_handler(CommandHandler('silence', on_silence, **kwargs))
     bot.add_handler(CommandHandler('help', on_help))
     bot.add_handler(RegexHandler(ASK_HELP_REGEX, on_ask_help))
     bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))

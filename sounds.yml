@@ -1,0 +1,44 @@
+- file: champd-ins.opus
+  commands:
+  - champd
+  - pogchamp
+  - champdup
+- file: champd.opus
+  commands:
+  - champdl
+- file: badumdish.opus
+  commands:
+  - badum
+- file: sadtrombone.opus
+  commands:
+  - sadtrombone
+  - trombone
+- file: hypetrain.opus
+  commands:
+  - hype
+  - train
+- file: circus.opus
+  commands:
+  - circus
+- file: chummypotato.opus
+  commands:
+  - potato
+- file: dishwasher.opus
+  commands:
+  - dishwasher
+- file: migros.opus
+  commands:
+  - migros
+- file: pingui.opus
+  commands:
+  - pingui
+  - kinder
+- file: drama.opus
+  commands:
+  - drama
+- file: perfection.opus
+  commands:
+  - perfection
+- file: silence.opus
+  commands:
+  - silence
