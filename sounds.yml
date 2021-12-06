@@ -42,3 +42,10 @@
 - file: silence.opus
   commands:
   - silence
+- file: tada.opus
+  commands:
+  - tada
+- file: victory.opus
+  commands:
+  - victory
+  - success
