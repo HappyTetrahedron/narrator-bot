@@ -32,6 +32,8 @@ def get_text(bot, message):
         return message.get_text()
     if state['mode'] == 'telegram':
         return bot.message.text
+    if state['mode'] == 'rocketchat':
+        return message["msg"]
 
 
 def reply(bot, message, text):
@@ -39,6 +41,8 @@ def reply(bot, message, text):
         message.reply(text)
     if state['mode'] == 'telegram':
         bot.message.reply_text(text, quote=False)
+    if state['mode'] == 'rocketchat':
+        bot.reply_to_message(message, text)
 
 
 def reply_event(bot, message, text):
@@ -50,6 +54,8 @@ def reply_event(bot, message, text):
         ))
     if state['mode'] == 'telegram':
         bot.message.reply_text(text, quote=False)
+    if state['mode'] == 'rocketchat':
+        bot.reply_to_message(message, text)
 
 
 def send_voice(bot, message, filename):
@@ -63,7 +69,9 @@ def send_voice(bot, message, filename):
             sent = bot.message.reply_voice(vfile, quote=False)
             vfile.close()
             sound_files[filename] = sent.effective_attachment.file_id
-
+    if state['mode'] == 'rocketchat':
+        vfile = sound_files[filename]
+        bot.api.rooms_upload(message["rid"], vfile, tmid=message.get("tmid"))
 
 def send_photo(bot, message, filename):
     if state['mode'] == 'beekeeper':
@@ -71,16 +79,18 @@ def send_photo(bot, message, filename):
         message.reply(ConversationMessage(bot.sdk, media=[photo]))
     if state['mode'] == 'telegram':
         bot.message.reply_photo(open(filename, 'rb'), quote=False)
+    if state['mode'] == 'rocketchat':
+        bot.api.rooms_upload(message["rid"], filename, tmid=message.get("tmid"))
 
 
 def on_say(bot, message):
     text = get_text(bot, message)
-    reply(bot, message, text.lstrip('/say').strip())
+    reply(bot, message, text.lstrip('/say').lstrip('$say').strip())
 
 
 def on_joke(bot, message):
     text = get_text(bot, message)
-    command = (text.lstrip('/joke').strip())
+    command = (text.lstrip('/joke').lstrip('$joke').strip())
     if ',' in command:
         parts = command.split(',')
     else:
@@ -99,6 +109,7 @@ def on_joke(bot, message):
     )
     status = process.returncode
     if status != 0:
+        print("joke script didn't work")
         return
 
     send_photo(bot, message, 'meme.png')
@@ -163,36 +174,6 @@ def is_casual_chat(bot, message):
     return True
 
 
-def init_sound_files(bot):
-    if state['mode'] == 'beekeeper':
-        sound_files['champd-ins'] = bot.sdk.files.upload_file_from_path("media/champd-ins.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['champd'] = bot.sdk.files.upload_file_from_path("media/champd.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['badum'] = bot.sdk.files.upload_file_from_path("media/badumdish.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['trombone'] = bot.sdk.files.upload_file_from_path("media/sadtrombone.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['hypetrain'] = bot.sdk.files.upload_file_from_path("media/hypetrain.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['circus'] = bot.sdk.files.upload_file_from_path("media/circus.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['chummypotato'] = bot.sdk.files.upload_file_from_path("media/chummypotato.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['dishwasher'] = bot.sdk.files.upload_file_from_path("media/dishwasher.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['migros'] = bot.sdk.files.upload_file_from_path("media/migros.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['pingui'] = bot.sdk.files.upload_file_from_path("media/pingui.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['drama'] = bot.sdk.files.upload_file_from_path("media/drama.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['perfection'] = bot.sdk.files.upload_file_from_path("media/perfection.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-        sound_files['silence'] = bot.sdk.files.upload_file_from_path("media/silence.opus", upload_type=FILE_UPLOAD_TYPE_VOICE)
-    if state['mode'] == 'telegram':
-        sound_files['champd'] = open("media/champd.opus", 'rb')
-        sound_files['champd-ins'] = open("media/champd-ins.opus", 'rb')
-        sound_files['badum'] = open("media/badumdish.opus", 'rb')
-        sound_files['trombone'] = open("media/sadtrombone.opus", 'rb')
-        sound_files['hypetrain'] = open("media/hypetrain.opus", 'rb')
-        sound_files['circus'] = open("media/circus.opus", 'rb')
-        sound_files['chummypotato'] = open("media/chummypotato.opus", 'rb')
-        sound_files['dishwasher'] = open("media/dishwasher.opus", 'rb')
-        sound_files['migros'] = open("media/migros.opus", 'rb')
-        sound_files['pingui'] = open("media/pingui.opus", 'rb')
-        sound_files['drama'] = open("media/drama.opus", 'rb')
-        sound_files['perfection'] = open("media/perfection.opus", 'rb')
-        sound_files['silence'] = open("media/silence.opus", 'rb')
-
 def register_sounds(bot, kwargs):
     with open('sounds.yml', 'r') as soundfile:
         sounds = yaml.load(soundfile, Loader=yaml.BaseLoader)
@@ -201,12 +182,10 @@ def register_sounds(bot, kwargs):
             sound_files[sound['file']] = bot.sdk.files.upload_file_from_path("media/{}".format(sound['file']), upload_type=FILE_UPLOAD_TYPE_VOICE)
         if state['mode'] == 'telegram':
             sound_files[sound['file']] = open("media/{}".format(sound['file']), 'rb')
+        if state['mode'] == 'rocketchat':
+            sound_files[sound['file']] = "media/{}".format(sound['file'])
         for command in sound['commands']:
             bot.add_handler(CommandHandler(command, (lambda bot, message, s=sound['file']: send_voice(bot, message, s)), **kwargs))
-
-    print(sound_files)
-
-
 
 
 def main(options):
@@ -217,6 +196,13 @@ def main(options):
     if state['mode'] == 'telegram':
         updater = Updater(config['bot_token'])
         bot = updater.dispatcher
+        kwargs = {}
+
+    if state['mode'] == 'rocketchat':
+        if 'bot_token' in config:
+            bot = RocketchatBot(api_token=config['bot_token'], user_id=config['bot_id'], server_url=config['server_url'])
+        else:
+            bot = RocketchatBot(username=config['bot_user'], password=config['bot_password'], server_url=config['server_url'])
         kwargs = {}
 
     register_sounds(bot, kwargs)
@@ -235,6 +221,8 @@ def main(options):
     if state['mode'] == 'telegram':
         updater.start_polling()
         updater.idle()
+    if state['mode'] == 'rocketchat':
+        bot.run_forever()
 
 
 if __name__ == "__main__":
@@ -244,8 +232,12 @@ if __name__ == "__main__":
     (opts, args) = parser.parse_args()
     with open(opts.config, 'r') as configfile:
         config = yaml.load(configfile, Loader=yaml.BaseLoader)
-        state['casual_conversation_marker'] = config['casual_conversation_marker_uuid']
+        state['casual_conversation_marker'] = config.get('casual_conversation_marker_uuid')
         state['mode'] = config['mode']
+        if state['mode'] == 'rocketchat':
+            from rocketchat_bot_sdk import RocketchatBot
+            from rocketchat_bot_sdk import CommandHandler
+            from rocketchat_bot_sdk import RegexHandler
         if state['mode'] == 'beekeeper':
             from beekeeper_chatbot_sdk import BeekeeperChatBot
             from beekeeper_sdk.conversations import ConversationMessage
