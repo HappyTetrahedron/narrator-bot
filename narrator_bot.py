@@ -33,7 +33,7 @@ def get_text(bot, message):
     if state['mode'] == 'telegram':
         return bot.message.text
     if state['mode'] == 'rocketchat':
-        return message["msg"]
+        return message.data["msg"]
 
 
 def reply(bot, message, text):
@@ -42,7 +42,7 @@ def reply(bot, message, text):
     if state['mode'] == 'telegram':
         bot.message.reply_text(text, quote=False)
     if state['mode'] == 'rocketchat':
-        bot.reply_to_message(message, text)
+        message.reply(text)
 
 
 def reply_event(bot, message, text):
@@ -55,7 +55,7 @@ def reply_event(bot, message, text):
     if state['mode'] == 'telegram':
         bot.message.reply_text(text, quote=False)
     if state['mode'] == 'rocketchat':
-        bot.reply_to_message(message, text)
+        message.reply(text)
 
 
 def send_voice(bot, message, filename):
@@ -71,7 +71,7 @@ def send_voice(bot, message, filename):
             sound_files[filename] = sent.effective_attachment.file_id
     if state['mode'] == 'rocketchat':
         vfile = sound_files[filename]
-        bot.api.rooms_upload(message["rid"], vfile, tmid=message.get("tmid"))
+        bot.api.rooms_upload(message.data["rid"], vfile, tmid=message.data.get("tmid"))
 
 def send_photo(bot, message, filename):
     if state['mode'] == 'beekeeper':
@@ -80,7 +80,7 @@ def send_photo(bot, message, filename):
     if state['mode'] == 'telegram':
         bot.message.reply_photo(open(filename, 'rb'), quote=False)
     if state['mode'] == 'rocketchat':
-        bot.api.rooms_upload(message["rid"], filename, tmid=message.get("tmid"))
+        bot.api.rooms_upload(message.data["rid"], filename, tmid=message.data.get("tmid"))
 
 
 def on_say(bot, message):
@@ -222,7 +222,7 @@ def main(options):
         updater.start_polling()
         updater.idle()
     if state['mode'] == 'rocketchat':
-        bot.run_forever()
+        asyncio.run(bot.run_forever())
 
 
 if __name__ == "__main__":
@@ -238,6 +238,7 @@ if __name__ == "__main__":
             from rocketchat_bot_sdk import RocketchatBot
             from rocketchat_bot_sdk import CommandHandler
             from rocketchat_bot_sdk import RegexHandler
+            import asyncio
         if state['mode'] == 'beekeeper':
             from beekeeper_chatbot_sdk import BeekeeperChatBot
             from beekeeper_sdk.conversations import ConversationMessage
