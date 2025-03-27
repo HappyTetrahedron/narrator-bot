@@ -27,6 +27,10 @@ conversation_cache = {}
 sound_files = {}
 
 
+# TODO(aa): After switching Telegram SDK to the newest version which uses asyncio, my quickfix broke all other chat integrations.
+# I don't particularly care right now, as they are not in use.
+# But eventually we need to wrap the other 2 chat SDKs in asyncio, or yeet them entirely.
+
 def get_text(bot, message):
     if state['mode'] == 'beekeeper':
         return message.get_text()
@@ -36,16 +40,16 @@ def get_text(bot, message):
         return message.data["msg"]
 
 
-def reply(bot, message, text):
+async def reply(bot, message, text):
     if state['mode'] == 'beekeeper':
         message.reply(text)
     if state['mode'] == 'telegram':
-        bot.message.reply_text(text, quote=False)
+        await bot.message.reply_text(text, do_quote=False)
     if state['mode'] == 'rocketchat':
         message.reply(text)
 
 
-def reply_event(bot, message, text):
+async def reply_event(bot, message, text):
     if state['mode'] == 'beekeeper':
         message.reply(ConversationMessage(
             bot.sdk,
@@ -53,42 +57,42 @@ def reply_event(bot, message, text):
             message_type=MESSAGE_TYPE_EVENT
         ))
     if state['mode'] == 'telegram':
-        bot.message.reply_text(text, quote=False)
+        await bot.message.reply_text(text, do_quote=False)
     if state['mode'] == 'rocketchat':
         message.reply(text)
 
 
-def send_voice(bot, message, filename):
+async def send_voice(bot, message, filename):
     if state['mode'] == 'beekeeper':
         message.reply(ConversationMessage(bot.sdk, media=[sound_files[filename]]))
     if state['mode'] == 'telegram':
         vfile = sound_files[filename]
         if isinstance(vfile, str):
-            bot.message.reply_voice(vfile, quote=False)
+            await bot.message.reply_voice(vfile, do_quote=False)
         else:
-            sent = bot.message.reply_voice(vfile, quote=False)
+            sent = await bot.message.reply_voice(vfile, do_quote=False)
             vfile.close()
             sound_files[filename] = sent.effective_attachment.file_id
     if state['mode'] == 'rocketchat':
         vfile = sound_files[filename]
         bot.api.rooms_upload(message.data["rid"], vfile, tmid=message.data.get("tmid"))
 
-def send_photo(bot, message, filename):
+async def send_photo(bot, message, filename):
     if state['mode'] == 'beekeeper':
         photo = bot.sdk.files.upload_photo_from_path("meme.png")
         message.reply(ConversationMessage(bot.sdk, media=[photo]))
     if state['mode'] == 'telegram':
-        bot.message.reply_photo(open(filename, 'rb'), quote=False)
+        await bot.message.reply_photo(open(filename, 'rb'), do_quote=False)
     if state['mode'] == 'rocketchat':
         bot.api.rooms_upload(message.data["rid"], filename, tmid=message.data.get("tmid"))
 
 
-def on_say(bot, message):
+async def on_say(bot, message):
     text = get_text(bot, message)
-    reply(bot, message, text.lstrip('/say').lstrip('$say').strip())
+    await reply(bot, message, text.lstrip('/say').lstrip('$say').strip())
 
 
-def on_joke(bot, message):
+async def on_joke(bot, message):
     text = get_text(bot, message)
     command = (text.lstrip('/joke').lstrip('$joke').strip())
     if ',' in command:
@@ -112,10 +116,10 @@ def on_joke(bot, message):
         print("joke script didn't work")
         return
 
-    send_photo(bot, message, 'meme.png')
+    await send_photo(bot, message, 'meme.png')
 
 
-def on_help(bot, message):
+async def on_help(bot, message):
     if is_casual_chat(bot, message):
         help_text = random.choice(HELPFUL_HELP)
     else:
@@ -125,42 +129,42 @@ def on_help(bot, message):
         message.reply_in_thread(help_text)
         return
 
-    reply(bot, message, help_text)
+    await reply(bot, message, help_text)
 
 
-def on_ask_help(bot, message):
+async def on_ask_help(bot, message):
     if random.random() > 0.9:
         if is_casual_chat(bot, message):
             if random.random() > 0.3:
-                reply_event(bot, message, "But nobody came.")
+                await reply_event(bot, message, "But nobody came.")
             else:
-                reply_event(bot, message, "No one's around to help.")
+                await reply_event(bot, message, "No one's around to help.")
 
 
-def on_will_do(bot, message):
+async def on_will_do(bot, message):
     if random.random() > 0.9:
         if is_casual_chat(bot, message):
-            reply_event(bot, message, "But they never did.")
+            await reply_event(bot, message, "But they never did.")
 
 
-def on_broke(bot, message):
+async def on_broke(bot, message):
     if random.random() > 0.75:
         if is_casual_chat(bot, message):
             if random.random() > 0.25:
-                reply(bot, message, "Did you try turning it off and on again?")
+                await reply(bot, message, "Did you try turning it off and on again?")
             else:
-                send_voice(bot, message, 'sadtrombone.opus')
+                await send_voice(bot, message, 'sadtrombone.opus')
 
 
-def on_wtf(bot, message):
+async def on_wtf(bot, message):
     if random.random() > 0.90:
         if is_casual_chat(bot, message):
-            send_voice(bot, message, 'perfection.opus')
+            await send_voice(bot, message, 'perfection.opus')
 
 
-def on_hangman(bot, message):
+async def on_hangman(bot, message):
     if random.random() > 0.9:
-        reply(bot, message, random.choice(ALPHABET))
+        await reply(bot, message, random.choice(ALPHABET))
 
 
 def is_casual_chat(bot, message):
@@ -200,8 +204,7 @@ def main(options):
         kwargs = {'message_types': [MESSAGE_TYPE_REGULAR, MESSAGE_TYPE_CONTROL]}
 
     if state['mode'] == 'telegram':
-        updater = Updater(config['bot_token'])
-        bot = updater.dispatcher
+        bot = Application.builder().token(config['bot_token']).build()
         kwargs = {}
 
     if state['mode'] == 'rocketchat':
@@ -216,17 +219,16 @@ def main(options):
     bot.add_handler(CommandHandler('say', on_say, **kwargs))
     bot.add_handler(CommandHandler('joke', on_joke, **kwargs))
     bot.add_handler(CommandHandler('help', on_help))
-    bot.add_handler(RegexHandler(ASK_HELP_REGEX, on_ask_help))
-    bot.add_handler(RegexHandler(I_WILL_DO_IT_REGEX, on_will_do))
-    bot.add_handler(RegexHandler(BROKE_REGEX, on_broke))
-    bot.add_handler(RegexHandler(WTF_REGEX, on_wtf))
-    bot.add_handler(RegexHandler(HANGMAN_REGEX, on_hangman))
+    bot.add_handler(MessageHandler(filters.Regex(ASK_HELP_REGEX), on_ask_help))
+    bot.add_handler(MessageHandler(filters.Regex(I_WILL_DO_IT_REGEX), on_will_do))
+    bot.add_handler(MessageHandler(filters.Regex(BROKE_REGEX), on_broke))
+    bot.add_handler(MessageHandler(filters.Regex(WTF_REGEX), on_wtf))
+    bot.add_handler(MessageHandler(filters.Regex(HANGMAN_REGEX), on_hangman))
 
     if state['mode'] == 'beekeeper':
         bot.start()
     if state['mode'] == 'telegram':
-        updater.start_polling()
-        updater.idle()
+        bot.run_polling()
     if state['mode'] == 'rocketchat':
         asyncio.run(bot.run_forever())
 
@@ -257,6 +259,8 @@ if __name__ == "__main__":
 
         if state['mode'] == 'telegram':
             from telegram.ext import CommandHandler
-            from telegram.ext import RegexHandler
+            from telegram.ext import MessageHandler
+            from telegram.ext import filters
             from telegram.ext import Updater
+            from telegram.ext import Application
     main(opts)
