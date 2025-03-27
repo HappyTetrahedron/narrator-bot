@@ -117,9 +117,15 @@ def on_joke(bot, message):
 
 def on_help(bot, message):
     if is_casual_chat(bot, message):
-        reply(bot, message, random.choice(HELPFUL_HELP))
+        help_text = random.choice(HELPFUL_HELP)
     else:
-        reply(bot, message, PROFESSIONAL_HELP)
+        help_text = PROFESSIONAL_HELP
+
+    if state['mode'] == 'rocketchat':
+        message.reply_in_thread(help_text)
+        return
+
+    reply(bot, message, help_text)
 
 
 def on_ask_help(bot, message):
